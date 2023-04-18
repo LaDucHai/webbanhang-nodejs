@@ -1,38 +1,40 @@
-const sql = require('mssql');
 const express = require('express');
 const router = require('./router');
+const cors = require('cors');
 const app = express();
 
-const sqlConfig = {
-    user: 'sa',
-    password: '20111995Hai',
-    database: 'UserInfor',
-    server: '103.178.233.184',
-    pool: {
-        max: 10,
-        min: 0,
-        idleTimeoutMillis: 30000
-    },
-    options: {
-        encrypt: true, // for azure
-        trustServerCertificate: false // change to true for local dev / self-signed certs
-    }
-}
+// core
+// const whitelist = ['http://localhost:3001'];
+// app.options('*', cors());
+// const corsOptions = {
+//   credentials: true,
+//   origin: (origin, callback) => {
+//     if (whitelist.indexOf(origin) !== -1 || !origin) {
+//       callback(null, true);
+//     } else {
+//       callback(new Error('Not allowed by CORS'));
+//     }
+//   },
+// };
+// app.use(cors(corsOptions));
 
-async () => {
-    try {
-    // make sure that any items are correctly URL encoded in the connection string
-    await sql.connect(sqlConfig)
-        const value = 'useridladuchai1';
-        const result = await sql.query `select * from dbo.UserInfor where UserId = ${value}`;
-        console.dir(result)
-    } catch (err) {
-        console.error(err);
-    }
-}
+app.use(function (req, res, next) {
+    // 👇️ specify CORS headers to send 👇️
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header(
+      'Access-Control-Allow-Methods',
+      'POST, PUT, PATCH, GET, DELETE, OPTIONS',
+    );
+    res.header(
+      'Access-Control-Allow-Headers',
+      'Origin, X-Api-Key, X-Requested-With, Content-Type, Accept, Authorization',
+    );
+    next();
+});
 
 app.use(express.json());
-app.use(express.static('.'));
+app.use(express.static('public'));
 app.use('/', router);
-  
+
+
 app.listen(3000, () => console.log('Example app is listening on port 3000.'));
