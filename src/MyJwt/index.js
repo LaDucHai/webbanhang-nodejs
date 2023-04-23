@@ -2,19 +2,22 @@ const jwt = require('jsonwebtoken');
 
 
 class MyJwt {
-    constructor (key) {
+    constructor (key, encodeString) {
         this._key = key;
+        this._encodeString = encodeString;
     }
 
-    sign (jsonData) {
+    sign(jsonData) {
         return jwt.sign(jsonData, this._key, { expiresIn: 60 * 60 });
     }
 
-    verify (token, callback) {
-        jwt.verify(token, this._key, function(err, decoded) {
-            if (err) console.error(err);
-            callback(decoded);
-        });
+    verify(token, callback) {
+        const token1 = token && token.split(" ");
+        if (token1[0] === this._encodeString) {
+            jwt.verify(token1[1], this._key, function(err, decoded) {
+                callback(err, decoded);
+            });
+        }
     }
 }
 

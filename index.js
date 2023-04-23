@@ -1,6 +1,7 @@
 const express = require('express');
 const router = require('./router');
-const cors = require('cors');
+const fileupload = require("express-fileupload");
+const bodyParser = require('body-parser');
 const app = express();
 
 // core
@@ -19,7 +20,7 @@ const app = express();
 // app.use(cors(corsOptions));
 
 app.use(function (req, res, next) {
-    // 👇️ specify CORS headers to send 👇️
+    // specify CORS headers to send
     res.header('Access-Control-Allow-Origin', '*');
     res.header(
       'Access-Control-Allow-Methods',
@@ -31,9 +32,12 @@ app.use(function (req, res, next) {
     );
     next();
 });
-
+app.use(fileupload());
 app.use(express.json());
 app.use(express.static('public'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
 app.use('/', router);
 
 
