@@ -62,6 +62,40 @@
 *} ProductImageOptions
 */
 
+/**
+*@typedef {
+*PageIndex: int,
+*PageSize: int
+*} ProductPages
+*/
+
+/**
+*@typedef {
+*Product_Id: string
+*} ProductImagePages
+*/
+
+/**
+*@typedef {
+*ProductLike_Id?: string,
+*User_Id: string,
+*Product_Id: string
+*} ProductLikeOptions
+*/
+
+/**
+*@typedef {
+*Address_Id: string,
+*Address_Province: string,
+*Address_District: string,
+*Address_Commune: string,
+*Address_Hamlet: string,
+*Address_Home_Number: string,
+*Address_Company_User: bit, --0: USER, 1: Company
+*Address_User_Id: string, 
+*Address_Company_Id: string
+*} AddressOptions
+*/
 
 
 class MyQuery {
@@ -69,6 +103,69 @@ class MyQuery {
     constructor(sql) {
         this._sql = sql;
     }
+
+    // get address list
+    getProvince(callback) {
+        let err;
+        let data;
+        this._sql.query `SELECT * FROM dbo.Province`
+        .then(result => {
+            data = result;
+        }).catch(error => {
+            err = error;
+        }).finally(() => {
+            callback(err, data);
+        })
+    }
+    getDistrict(condition, callback) {
+        let err;
+        let data;
+        this._sql.query `SELECT * FROM dbo.District WHERE District_Province = ${condition}`
+        .then(result => {
+            data = result;
+        }).catch(error => {
+            err = error;
+        }).finally(() => {
+            callback(err, data);
+        })
+    }
+    getCommune(condition, callback) {
+        let err;
+        let data;
+        this._sql.query `SELECT * FROM dbo.Commune WHERE Commune_District = ${condition}`
+        .then(result => {
+            data = result;
+        }).catch(error => {
+            err = error;
+        }).finally(() => {
+            callback(err, data);
+        })
+    }
+    getHamlet(condition, callback) {
+        let err;
+        let data;
+        this._sql.query `SELECT * FROM dbo.Hamlet WHERE Hamlet_Commune = ${condition}`
+        .then(result => {
+            data = result;
+        }).catch(error => {
+            err = error;
+        }).finally(() => {
+            callback(err, data);
+        })
+    }
+    getHome_Number(condition, callback) {
+        let err;
+        let data;
+        this._sql.query `SELECT * FROM dbo.Home_Number WHERE Home_Number_Hamlet = ${condition}`
+        .then(result => {
+            data = result;
+        }).catch(error => {
+            err = error;
+        }).finally(() => {
+            callback(err, data);
+        })
+    }
+    //----------------
 
     signup(signupOptions, callback) {
         let err;
@@ -114,6 +211,19 @@ class MyQuery {
         })
     }
 
+    getCompanyDetail(companyId, callback) {
+        let err;
+        let data;
+        this._sql.query `EXEC proc_getCompany_withId ${companyId}`
+        .then(result => {
+            data = result;
+        }).catch(error => {
+            err = error;
+        }).finally(() => {
+            callback(err, data);
+        })
+    }
+
     addCompany(addCompanyOptions, callback) {
         let err;
         let data;
@@ -127,6 +237,28 @@ class MyQuery {
         ${addCompanyOptions.Company_Tax_Code}, 
         ${addCompanyOptions.Company_Star}, 
         ${addCompanyOptions.Company_User_Id}`
+        .then(result => {
+            data = result;
+        }).catch(error => {
+            err = error;
+        }).finally(() => {
+            callback(err, data);
+        })
+    }
+
+    addAddress(addressOptions, callback) {
+        let err;
+        let data;
+        this._sql.query `EXEC proc_addAddress 
+        ${addressOptions.Address_Id},
+        ${addressOptions.Address_Province},
+        ${addressOptions.Address_District},
+        ${addressOptions.Address_Commune},
+        ${addressOptions.Address_Hamlet},
+        ${addressOptions.Address_Home_Number},
+        ${addressOptions.Address_Company_User},
+        ${addressOptions.Address_User_Id}, 
+        ${addressOptions.Address_Company_Id}`
         .then(result => {
             data = result;
         }).catch(error => {
@@ -174,6 +306,111 @@ class MyQuery {
         ${productImageOptions.ProductImage_Product_Id}`
         .then(result => {
             data = result;
+        }).catch(error => {
+            err = error;
+        }).finally(() => {
+            callback(err, data);
+        })
+    }
+
+    getProduct(productPages, callback) {
+        let err;
+        let data;
+        this._sql.query `EXEC proc_product_pagination 
+        ${productPages.PageIndex},
+        ${productPages.PageSize}`
+        .then(result => {
+            data = result;
+        }).catch(error => {
+            err = error;
+        }).finally(() => {
+            callback(err, data);
+        })
+    }
+
+    getProductImage(productImagePages, callback) {
+        let err;
+        let data;
+        this._sql.query `EXEC proc_productImage_pagination 
+        ${productImagePages.Product_Id}`
+        .then(result => {
+            data = result;
+        }).catch(error => {
+            err = error;
+        }).finally(() => {
+            callback(err, data);
+        })
+    }
+
+    getProductLike(productLikeOptions, callback) {
+        let err;
+        let data;
+        this._sql.query `EXEC proc_getProductLike 
+        ${productLikeOptions.User_Id},
+        ${productLikeOptions.Product_Id}`
+        .then(result => {
+            data = result;
+        }).catch(error => {
+            err = error;
+        }).finally(() => {
+            callback(err, data);
+        })
+    }
+    
+    disLikeProduct(productLikeOptions, callback) {
+        let err;
+        let data;
+        this._sql.query `EXEC proc_disLikeProduct 
+        ${productLikeOptions.User_Id},
+        ${productLikeOptions.Product_Id}`
+        .then(result => {
+            data = result;
+        }).catch(error => {
+            err = error;
+        }).finally(() => {
+            callback(err, data);
+        })
+    }
+
+    likeProduct(productLikeOptions, callback) {
+        let err;
+        let data;
+        this._sql.query `EXEC proc_likeProduct 
+        ${productLikeOptions.ProductLike_Id},
+        ${productLikeOptions.User_Id},
+        ${productLikeOptions.Product_Id}`
+        .then(result => {
+            data = result;
+        }).catch(error => {
+            err = error;
+        }).finally(() => {
+            callback(err, data);
+        })
+    }
+
+    getProductDetail(product_Id, callback) {
+        let err;
+        let data;
+        const promise1 = new Promise((resolve, reject) => {
+            this._sql.query `EXEC proc_getProduct_withId
+            ${product_Id}`
+            .then(result => {
+                resolve(result);
+            }).catch(error => {
+                reject(error);
+            })
+        })
+        const promise2 = new Promise((resolve, reject) => {
+            this._sql.query `EXEC proc_productImage_pagination 
+            ${product_Id}`
+            .then(result => {
+                resolve(result);
+            }).catch(error => {
+                reject(error);
+            })
+        })
+        Promise.all([promise1, promise2]).then((values) => {
+            data = values;
         }).catch(error => {
             err = error;
         }).finally(() => {

@@ -8,7 +8,7 @@ class MyJwt {
     }
 
     sign(jsonData) {
-        return jwt.sign(jsonData, this._key, { expiresIn: 60 * 60 });
+        return jwt.sign(jsonData, this._key, { expiresIn: 60 * 60 * 24 });
     }
 
     verify(token, callback) {

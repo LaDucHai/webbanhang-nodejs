@@ -41,4 +41,28 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/', router);
 
 
-app.listen(3000, () => console.log('Example app is listening on port 3000.'));
+// test
+// const promise1 = new Promise((resolve, reject) => {
+//   resolve(1);
+//   // reject('loi');
+// })
+
+// const promise2 = new Promise((resolve, reject) => {
+//   // resolve(2);
+//   reject('loi 2');
+// })
+
+// // promise1
+// // .then(data => console.log('promise1', 'data', data))
+// // .catch(err =>console.log('promise1', 'err', err))
+
+// // promise2
+// // .then(data => console.log('promise2', 'data', data))
+// // .catch(err =>console.log('promise2', 'err', err))
+
+// Promise.all([promise1, promise2]).then((values) => {
+//   console.log(values);
+// }).catch(err => console.error(err))
+
+
+app.listen(4000, () => console.log('Example app is listening on port 4000.'));
