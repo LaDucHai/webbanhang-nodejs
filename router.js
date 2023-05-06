@@ -3,6 +3,7 @@ const router = express.Router();
 const sql = require('mssql');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
+const { createClient } = require('redis'); 
 
 const { MyQuery } = require('./src/MyQuery/index');
 const { MyJwt } = require('./src/MyJwt/index');
@@ -37,17 +38,7 @@ sql.on('error', err => {
 })
 const myQuery = new MyQuery(sql);
 const loginJwt = new MyJwt(TOKENKEY, TOKENENCODESTRING);
-// async () => {
-//     try {
-//         // make sure that any items are correctly URL encoded in the connection string
-//         await sql.connect(sqlConfig)
-//         const value = 'useridladuchai1';
-//         const result = await sql.query `select * from dbo.UserInfor where UserId = ${value}`;
-//         console.dir(result)
-//     } catch (err) {
-//         console.error(err);
-//     }
-// }
+
 
 router.get('/', (req, res) => {
 
@@ -149,7 +140,7 @@ router.get('/getUserInfor', JwtVerify, (req, res) => {
     
 });
 
-router.get('/company:id', JwtVerify, (req, res) => {
+router.get('/company:id', (req, res) => {
     const id = req.params.id;
     try {
         if (id === 'myCompany') {
@@ -357,6 +348,33 @@ router.get('/product', (req, res) => {
                 handleData(res, err, data);
             })
             break;
+        
+        case 'productWithOptions':
+            let productWithOptions = {
+                PageIndex: req.query.pageIndex, 
+                PageSize: req.query.pageSize,
+                Product_Type: req.query.productType,
+                Product_Industry: req.query.productIndustry,
+                Product_Price1: req.query.productPrice1,
+                Product_Price2: req.query.productPrice2,
+                Product_Sale1: req.query.productSale1,
+                Product_Sale2: req.query.productSale2
+            }
+            myQuery.getProductWithOptions(productWithOptions, (err, data) => {
+                handleData(res, err, data);
+            })
+            break;
+            
+        case 'productWithSearch':
+            let productWithSearch = {
+                PageIndex: req.query.pageIndex, 
+                PageSize: req.query.pageSize,
+                Product_Name: req.query.productName,
+            }
+            myQuery.getProductWithSearch(productWithSearch, (err, data) => {
+                handleData(res, err, data);
+            })
+            break;
 
         case 'productImage':
             const product_Id = req.query.productId;
@@ -388,7 +406,96 @@ router.get('/product', (req, res) => {
         default:
             return res.send({
                 state: false,
-                err: {message: 'Invalid parameter'}
+                err: {message: 'Invalid parameter (product)'}
+            });
+    }
+});
+
+router.post('/cart', JwtVerify, (req, res) => {
+    const type = req.query.type;
+    switch(type) {
+        case 'addCart':
+            let cartOptions = req.body;
+            cartOptions.Cart_Id = uuidv4();
+            myQuery.addCart(cartOptions, (err, data) => {
+                handleData(res, err, data);
+            })
+            break;
+
+        default:
+            return res.send({
+                state: false,
+                err: {message: 'Invalid parameter (cart)'}
+            });
+    }
+})
+
+router.get('/cart', JwtVerify, (req, res) => {
+    const type = req.query.type;
+    switch(type) {
+        case 'getCart':
+            let userId = req.query.userId;
+            myQuery.getCart(userId, (err, data) => {
+                handleData(res, err, data);
+            })
+            break;
+
+        default:
+            return res.send({
+                state: false,
+                err: {message: 'Invalid parameter (cart)'}
+            });
+    }
+});
+
+router.get('/chat', JwtVerify, (req, res) => {
+    const type = req.query.type;
+    switch(type) {
+        case 'getChatRoom':
+            let chatRoomsOptions_getChatRoom = {
+                ChatRooms_User1_Id: req.query.userId1,
+                ChatRooms_User2_Id: req.query.userId2
+            }
+            myQuery.getChatRoom(chatRoomsOptions_getChatRoom, (err, data) => {
+                handleData(res, err, data);
+            })
+            break;
+        
+        case 'addChatRoom':
+            let chatRoomsOptions_addChatRoom = {
+                ChatRomms_Id: uuidv4(),
+                ChatRooms_User1_Id: req.query.userId1,
+                ChatRooms_User2_Id: req.query.userId2
+            }
+            myQuery.addChatRoom(chatRoomsOptions_addChatRoom, (err, data) => {
+                const data_1 = data;
+                data && (data_1.ChatRomms_Id = chatRoomsOptions_addChatRoom.ChatRomms_Id)
+                handleData(res, err, data_1);
+            })
+            break;
+        
+        case 'getMessage':
+            let roomId = req.query.roomId;
+            myQuery.getMessage(roomId, (err, data) => {
+                handleData(res, err, data);
+            })
+            break;
+        
+        case 'getMessagePages':
+            let messagePages = {
+                PageIndex: req.query.pageIndex,
+                PageSize: req.query.pageSize,
+                ChatRomms_Id: req.query.chatRomms_Id
+            };
+            myQuery.getMessagePages(messagePages, (err, data) => {
+                handleData(res, err, data);
+            })
+            break;
+
+        default:
+            return res.send({
+                state: false,
+                err: {message: 'Invalid parameter (chat)'}
             });
     }
 });

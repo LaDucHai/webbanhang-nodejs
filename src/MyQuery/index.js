@@ -65,7 +65,14 @@
 /**
 *@typedef {
 *PageIndex: int,
-*PageSize: int
+*PageSize: int,
+*Product_Name?: string,
+*Product_Type?: string, 
+*Product_Industry?: string, 
+*Product_Price1?: float, 
+*Product_Price2?: float,
+*Product_Sale1?: float,
+*Product_Sale2?: float
 *} ProductPages
 */
 
@@ -95,6 +102,42 @@
 *Address_User_Id: string, 
 *Address_Company_Id: string
 *} AddressOptions
+*/
+
+/**
+*@typedef {
+*Cart_Id: string,
+*Cart_Product_Id: string,
+*Cart_User_Id: string,
+*Cart_Type: string
+*} CartOptions
+*/
+
+/**
+*@typedef {
+*ChatRomms_Id?: string,
+*ChatRooms_User1_Id: string,
+*ChatRooms_User2_Id: string
+*} ChatRoomsOptions
+*/
+
+/**
+*@typedef {
+*Messages_Id: string,
+*Messages_ChatRoom_Id: string,
+*Messages_Message: string,
+*Messages_User_Id: string,
+*Messages_Type: string,  
+*Messages_State: string,  
+*} MessageOptions 
+*/
+
+/**
+*@typedef {
+*PageIndex: int,
+*PageSize: int,
+*ChatRoom_Id: string  
+*} MessagePages
 */
 
 
@@ -328,6 +371,43 @@ class MyQuery {
         })
     }
 
+    getProductWithOptions(productPages, callback) {
+        let err;
+        let data;
+        this._sql.query `EXEC proc_product_pagination_withOptions 
+        ${productPages.PageIndex},
+        ${productPages.PageSize},
+        ${productPages.Product_Type},
+        ${productPages.Product_Industry},
+        ${productPages.Product_Price1},
+        ${productPages.Product_Price2},
+        ${productPages.Product_Sale1},
+        ${productPages.Product_Sale2}`
+        .then(result => {
+            data = result;
+        }).catch(error => {
+            err = error;
+        }).finally(() => {
+            callback(err, data);
+        })
+    }
+
+    getProductWithSearch(productPages, callback) {
+        let err;
+        let data;
+        this._sql.query `EXEC proc_product_pagination_withSearch 
+        ${productPages.PageIndex},
+        ${productPages.PageSize},
+        ${productPages.Product_Name}`
+        .then(result => {
+            data = result;
+        }).catch(error => {
+            err = error;
+        }).finally(() => {
+            callback(err, data);
+        })
+    }
+
     getProductImage(productImagePages, callback) {
         let err;
         let data;
@@ -411,6 +491,131 @@ class MyQuery {
         })
         Promise.all([promise1, promise2]).then((values) => {
             data = values;
+        }).catch(error => {
+            err = error;
+        }).finally(() => {
+            callback(err, data);
+        })
+    }
+
+    addCart(cartOptions, callback) {
+        let err;
+        let data;
+        this._sql.query `EXEC proc_addCart 
+        ${cartOptions.Cart_Id},
+        ${cartOptions.Cart_Type},
+        ${cartOptions.Cart_Product_Id},
+        ${cartOptions.Cart_User_Id}`
+        .then(result => {
+            data = result;
+        }).catch(error => {
+            err = error;
+        }).finally(() => {
+            callback(err, data);
+        })
+    }
+
+    getCart(userId, callback) {
+        let err;
+        let data;
+        this._sql.query `EXEC proc_getCart 
+        ${userId}`
+        .then(result => {
+            data = result;
+        }).catch(error => {
+            err = error;
+        }).finally(() => {
+            callback(err, data);
+        })
+    }
+
+    getChatRoom(chatRoomsOptions, callback) {
+        let err;
+        let data;
+        this._sql.query `EXEC proc_getChatRoom 
+        ${chatRoomsOptions.ChatRooms_User1_Id},
+        ${chatRoomsOptions.ChatRooms_User2_Id}`
+        .then(result => {
+            data = result;
+        }).catch(error => {
+            err = error;
+        }).finally(() => {
+            callback(err, data);
+        })
+    }
+
+    getChatRomms(chatRoomsUserId, callback) {
+        let err;
+        let data;
+        this._sql.query `EXEC proc_getChatRooms 
+        ${chatRoomsUserId}`
+        .then(result => {
+            data = result;
+        }).catch(error => {
+            err = error;
+        }).finally(() => {
+            callback(err, data);
+        })
+    }
+
+    addChatRoom(chatRoomsOptions, callback) {
+        let err;
+        let data;
+        this._sql.query `EXEC proc_addChatRoom 
+        ${chatRoomsOptions.ChatRomms_Id},
+        ${chatRoomsOptions.ChatRooms_User1_Id},
+        ${chatRoomsOptions.ChatRooms_User2_Id}`
+        .then(result => {
+            data = result;
+        }).catch(error => {
+            err = error;
+        }).finally(() => {
+            callback(err, data);
+        })
+    }
+
+    addMessage(messageOptions, callback) {
+        let err;
+        let data;
+        this._sql.query `EXEC proc_addMesage 
+        ${messageOptions.Messages_Id},
+        ${messageOptions.Messages_ChatRoom_Id},
+        ${messageOptions.Messages_Message},
+        ${messageOptions.Messages_User_Id},
+        ${messageOptions.Messages_Type},
+        ${messageOptions.Messages_State}`
+        .then(result => {
+            data = result;
+        }).catch(error => {
+            err = error;
+        }).finally(() => {
+            callback(err, data);
+        })
+    }
+
+    getMessage(roomId, callback) {
+        let err;
+        let data;
+        this._sql.query `EXEC proc_getMessages 
+        ${roomId}`
+        .then(result => {
+            data = result;
+        }).catch(error => {
+            err = error;
+        }).finally(() => {
+            callback(err, data);
+        })
+    }
+
+    getMessagePages(messagePages, callback) {
+        let err;
+        let data;
+        this._sql.query `EXEC proc_getMessages_pagination 
+        ${messagePages.PageIndex},
+        ${messagePages.PageSize},
+        ${messagePages.ChatRomms_Id}`
+        .then(result => {
+            data = result;
         }).catch(error => {
             err = error;
         }).finally(() => {
