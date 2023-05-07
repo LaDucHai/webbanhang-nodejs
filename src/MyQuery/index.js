@@ -140,6 +140,19 @@
 *} MessagePages
 */
 
+/**
+*@typedef {
+*Messages_User_Id: string,
+*ChatRoom_Id: string
+*} Messages_notSeenOptions 
+*/
+
+/**
+*@typedef {
+*User_Id: string,
+*ChatRoom_Id: string
+*} updateMessageStateOptions
+*/
 
 class MyQuery {
 
@@ -238,6 +251,20 @@ class MyQuery {
             callback(result);
         }).catch(err => {
             console.error(err);
+        })
+    }
+
+    getUserName(userId, callback) {
+        let err;
+        let data;
+        this._sql.query `EXEC proc_getUserName 
+        ${userId}`
+        .then(result => {
+            data = result;
+        }).catch(error => {
+            err = error;
+        }).finally(() => {
+            callback(err, data);
         })
     }
 
@@ -544,7 +571,7 @@ class MyQuery {
         })
     }
 
-    getChatRomms(chatRoomsUserId, callback) {
+    getChatRooms(chatRoomsUserId, callback) {
         let err;
         let data;
         this._sql.query `EXEC proc_getChatRooms 
@@ -614,6 +641,36 @@ class MyQuery {
         ${messagePages.PageIndex},
         ${messagePages.PageSize},
         ${messagePages.ChatRomms_Id}`
+        .then(result => {
+            data = result;
+        }).catch(error => {
+            err = error;
+        }).finally(() => {
+            callback(err, data);
+        })
+    }
+
+    getMessages_notSeen(messages_notSeenOptions, callback) {
+        let err;
+        let data;
+        this._sql.query `EXEC proc_getMessages_notSeen 
+        ${messages_notSeenOptions.Messages_User_Id},
+        ${messages_notSeenOptions.ChatRoom_Id}`
+        .then(result => {
+            data = result;
+        }).catch(error => {
+            err = error;
+        }).finally(() => {
+            callback(err, data);
+        })
+    }
+
+    updateMessageState(updateMessageStateOptions, callback) {
+        let err;
+        let data;
+        this._sql.query `EXEC proc_updateMessageState 
+        ${updateMessageStateOptions.User_Id},
+        ${updateMessageStateOptions.ChatRoom_Id}`
         .then(result => {
             data = result;
         }).catch(error => {

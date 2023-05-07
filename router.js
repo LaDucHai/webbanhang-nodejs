@@ -137,8 +137,21 @@ router.get('/getUserInfor', JwtVerify, (req, res) => {
             err: err
         });
     }
-    
 });
+
+router.get('/userName', (req, res) => {
+    try {
+        let userId = req.query.userId;
+        myQuery.getUserName(userId, (err, data) => {
+            handleData(res, err, data);
+        });
+    } catch (error) {
+        res.send({
+            state: false,
+            err: err
+        });
+    }
+})
 
 router.get('/company:id', (req, res) => {
     const id = req.params.id;
@@ -460,6 +473,13 @@ router.get('/chat', JwtVerify, (req, res) => {
                 handleData(res, err, data);
             })
             break;
+
+        case 'getChatRooms':
+            let userId = req.query.userId;
+            myQuery.getChatRooms(userId, (err, data) => {
+                handleData(res, err, data);
+            })
+            break;
         
         case 'addChatRoom':
             let chatRoomsOptions_addChatRoom = {
@@ -488,6 +508,26 @@ router.get('/chat', JwtVerify, (req, res) => {
                 ChatRomms_Id: req.query.chatRomms_Id
             };
             myQuery.getMessagePages(messagePages, (err, data) => {
+                handleData(res, err, data);
+            })
+            break;
+            
+        case 'getMessages_notSeen':
+            let messages_notSeenOptions = {
+                Messages_User_Id: req.query.messagesUserId,
+                ChatRoom_Id: req.query.chatRoomId
+            }
+            myQuery.getMessages_notSeen(messages_notSeenOptions, (err, data) => {
+                handleData(res, err, data);
+            })
+            break;
+
+        case 'updateMessageState':
+            let updateMessageStateOptions = {
+                User_Id: req.query.userId,
+                ChatRoom_Id: req.query.chatRoomId
+            }
+            myQuery.updateMessageState(updateMessageStateOptions, (err, data) => {
                 handleData(res, err, data);
             })
             break;
